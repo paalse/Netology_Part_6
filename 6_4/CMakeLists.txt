@@ -1,0 +1,8 @@
+cmake_minimum_required(VERSION 3.2)
+project(MyDataBase)
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(LIBPQXX_DIR "C:/_Pavlov/C++Project/Netology/libpqxx-master")
+find_package(libpqxx CONFIG REQUIRED)
+add_executable(MyDataBase main.cpp "MyDataBase.h")
+target_link_libraries(MyDataBase PRIVATE libpqxx::pqxx)

@@ -1,0 +1,12 @@
+#*.*
+#!*.cpp
+#!*.h
+!.gitignore
+!README.md
+!CMakeLists.txt
+x64/
+.vs/
+out/
+6_1/
+6_2/
+6_3/
