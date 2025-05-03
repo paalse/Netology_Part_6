@@ -52,9 +52,9 @@ int  MyDataBase::addClient(std::string first_name, std::string second_name, std:
 	// Получение следующего значения сиквенса
 	int id = tx.query_value<int>("SELECT nextval('client_id_seq')");
 	// Выполнение вставки клиента
-	tx.exec("INSERT INTO client(id, first_name, second_name, email) VALUES(" + std::to_string(id) + ", '" + first_name + "', '" + second_name + "', '" + email + "')");
+	tx.exec("INSERT INTO client(id, first_name, second_name, email) VALUES(" + tx.esc(std::to_string(id)) + ", '" + tx.esc(first_name) + "', '" + tx.esc(second_name) + "', '" + tx.esc(email) + "')");
 	//Вставка телефона клиента
-	tx.exec("INSERT INTO phone(phone, client_id) values('" + phone + "', " + std::to_string(id) + ")");
+	tx.exec("INSERT INTO phone(phone, client_id) values('" + tx.esc(phone) + "', " + tx.esc(std::to_string(id)) + ")");
 	tx.commit();
 
 	return id;
@@ -64,7 +64,7 @@ int  MyDataBase::addClient(std::string first_name, std::string second_name, std:
 void MyDataBase::addClientPhone(int client_id, std::string phone) {
 	pqxx::work tx(*db_conn);
 
-	tx.exec("INSERT INTO phone(phone, client_id) values('" + phone + "', " + std::to_string(client_id) + ")");
+	tx.exec("INSERT INTO phone(phone, client_id) values('" + tx.esc(phone) + "', " + tx.esc(std::to_string(client_id)) + ")");
 	tx.commit();
 }
 
@@ -72,7 +72,7 @@ void MyDataBase::addClientPhone(int client_id, std::string phone) {
 void MyDataBase::changeClientData(int client_id, std::string first_name, std::string second_name, std::string email) {
 	pqxx::work tx(*db_conn);
 
-	tx.exec("UPDATE client SET first_name='" + first_name + "', second_name='" + second_name + "', email='" + email + "' WHERE id = '" + std::to_string(client_id) + "'");
+	tx.exec("UPDATE client SET first_name='" + tx.esc(first_name) + "', second_name='" + tx.esc(second_name) + "', email='" + tx.esc(email) + "' WHERE id = '" + tx.esc(std::to_string(client_id)) + "'");
 	tx.commit();
 }
 
@@ -80,7 +80,7 @@ void MyDataBase::changeClientData(int client_id, std::string first_name, std::st
 void MyDataBase::deleteClientPhone(int client_id, std::string phone) {
 	pqxx::work tx(*db_conn);
 
-	tx.exec("DELETE FROM phone p WHERE p.client_id=" + std::to_string(client_id) + " AND p.phone='" + phone + "'");
+	tx.exec("DELETE FROM phone p WHERE p.client_id=" + tx.esc(std::to_string(client_id)) + " AND p.phone='" + tx.esc(phone) + "'");
 	tx.commit();
 }
 
@@ -88,7 +88,7 @@ void MyDataBase::deleteClientPhone(int client_id, std::string phone) {
 void MyDataBase::deleteClient(int client_id) {
 	pqxx::work tx(*db_conn);
 
-	tx.exec("DELETE FROM client c WHERE c.id=" + std::to_string(client_id));
+	tx.exec("DELETE FROM client c WHERE c.id=" + tx.esc(std::to_string(client_id)));
 	tx.commit();
 }
 
@@ -98,10 +98,10 @@ int MyDataBase::selectClient(std::string first_name, std::string second_name, st
 	int id = 0;
 
 	if (phone == "") {
-		id = tx.query_value<int>("SELECT c.id FROM client c WHERE c.first_name='" + first_name + "' AND c.second_name='" + second_name + "' AND c.email='" + email + "'");
+		id = tx.query_value<int>("SELECT c.id FROM client c WHERE c.first_name='" + tx.esc(first_name) + "' AND c.second_name='" + tx.esc(second_name) + "' AND c.email='" + tx.esc(email) + "'");
 	}
 	else {
-		id = tx.query_value<int>("SELECT c.id FROM client c	JOIN phone p ON p.client_id = c.id WHERE p.phone = '" + phone + "'");
+		id = tx.query_value<int>("SELECT c.id FROM client c	JOIN phone p ON p.client_id = c.id WHERE p.phone = '" + tx.esc(phone) + "'");
 	}
 	return id;
 }
