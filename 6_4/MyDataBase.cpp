@@ -16,18 +16,18 @@ MyDataBase::MyDataBase() {
 	}
 }
 
-// Метод, создающий структуру таблиц.
+// РњРµС‚РѕРґ, СЃРѕР·РґР°СЋС‰РёР№ СЃС‚СЂСѓРєС‚СѓСЂСѓ С‚Р°Р±Р»РёС†.
 void MyDataBase::createDB() {
 	pqxx::work tx(*db_conn);
 
-	// Создание таблицы с клиентами
+	// РЎРѕР·РґР°РЅРёРµ С‚Р°Р±Р»РёС†С‹ СЃ РєР»РёРµРЅС‚Р°РјРё
 	tx.exec("CREATE TABLE IF NOT EXISTS client ("
 		"id serial PRIMARY KEY,"
 		"first_name varchar(50) NOT NULL,"
 		"second_name varchar(50) NOT NULL,"
 		"email varchar(50) NOT NULL)");
 
-	// Создание таблицы с телефонами
+	// РЎРѕР·РґР°РЅРёРµ С‚Р°Р±Р»РёС†С‹ СЃ С‚РµР»РµС„РѕРЅР°РјРё
 	tx.exec("CREATE TABLE IF NOT EXISTS phone("
 		"phone varchar(50) PRIMARY KEY,"
 		"client_id integer NOT NULL REFERENCES client(id) ON DELETE CASCADE)");
@@ -35,7 +35,7 @@ void MyDataBase::createDB() {
 	tx.commit();
 }
 
-// Метод для удаления таблиц
+// РЎРµС‚РѕРґ РґР»СЏ СѓРґР°Р»РµРЅРёСЏ С‚Р°Р±Р»РёС†
 void MyDataBase::dropDB() {
 	pqxx::work tx(*db_conn);
 
@@ -45,22 +45,22 @@ void MyDataBase::dropDB() {
 	tx.commit();
 }
 
-// Метод, позволяющий добавить нового клиента, возвращает id клиента
+// РњРµС‚РѕРґ, РїРѕР·РІРѕР»СЏСЋС‰РёР№ РґРѕР±Р°РІРёС‚СЊ РЅРѕРІРѕРіРѕ РєР»РёРµРЅС‚Р°, РІРѕР·РІСЂР°С‰Р°РµС‚ id РєР»РёРµРЅС‚Р°
 int  MyDataBase::addClient(std::string first_name, std::string second_name, std::string email, std::string phone) {
 	pqxx::work tx(*db_conn);
 
-	// Получение следующего значения сиквенса
+	// РџРѕР»СѓС‡РµРЅРёРµ СЃР»РµРґСѓСЋС‰РµРіРѕ Р·РЅР°С‡РµРЅРёСЏ СЃРёРєРІРµРЅСЃР°
 	int id = tx.query_value<int>("SELECT nextval('client_id_seq')");
-	// Выполнение вставки клиента
+	// В¬С‹РїРѕР»РЅРµРЅРёРµ РІСЃС‚Р°РІРєРё РєР»РёРµРЅС‚Р°
 	tx.exec("INSERT INTO client(id, first_name, second_name, email) VALUES(" + tx.esc(std::to_string(id)) + ", '" + tx.esc(first_name) + "', '" + tx.esc(second_name) + "', '" + tx.esc(email) + "')");
-	//Вставка телефона клиента
+	//В¬СЃС‚Р°РІРєР° С‚РµР»РµС„РѕРЅР° РєР»РёРµРЅС‚Р°
 	tx.exec("INSERT INTO phone(phone, client_id) values('" + tx.esc(phone) + "', " + tx.esc(std::to_string(id)) + ")");
 	tx.commit();
 
 	return id;
 }
 
-// Метод, позволяющий добавить телефон для существующего клиента.
+// РњРµС‚РѕРґ, РїРѕР·РІРѕР»СЏСЋС‰РёР№ РґРѕР±Р°РІРёС‚СЊ С‚РµР»РµС„РѕРЅ РґР»СЏ СЃСѓС‰РµСЃС‚РІСѓСЋС‰РµРіРѕ РєР»РёРµРЅС‚Р°.
 void MyDataBase::addClientPhone(int client_id, std::string phone) {
 	pqxx::work tx(*db_conn);
 
@@ -68,7 +68,7 @@ void MyDataBase::addClientPhone(int client_id, std::string phone) {
 	tx.commit();
 }
 
-// Метод, позволяющий изменить данные о клиенте.
+// РњРµС‚РѕРґ, РїРѕР·РІРѕР»СЏСЋС‰РёР№ РёР·РјРµРЅРёС‚СЊ РґР°РЅРЅС‹Рµ Рѕ РєР»РёРµРЅС‚Рµ.
 void MyDataBase::changeClientData(int client_id, std::string first_name, std::string second_name, std::string email) {
 	pqxx::work tx(*db_conn);
 
@@ -76,7 +76,7 @@ void MyDataBase::changeClientData(int client_id, std::string first_name, std::st
 	tx.commit();
 }
 
-// Метод, позволяющий удалить телефон у существующего клиента.
+// РњРµС‚РѕРґ, РїРѕР·РІРѕР»СЏСЋС‰РёР№ СѓРґР°Р»РёС‚СЊ С‚РµР»РµС„РѕРЅ Сѓ СЃСѓС‰РµСЃС‚РІСѓСЋС‰РµРіРѕ РєР»РёРµРЅС‚Р°.
 void MyDataBase::deleteClientPhone(int client_id, std::string phone) {
 	pqxx::work tx(*db_conn);
 
@@ -84,7 +84,7 @@ void MyDataBase::deleteClientPhone(int client_id, std::string phone) {
 	tx.commit();
 }
 
-// Метод, позволяющий удалить существующего клиента.
+// РњРµС‚РѕРґ, РїРѕР·РІРѕР»СЏСЋС‰РёР№ СѓРґР°Р»РёС‚СЊ СЃСѓС‰РµСЃС‚РІСѓСЋС‰РµРіРѕ РєР»РёРµРЅС‚Р°.
 void MyDataBase::deleteClient(int client_id) {
 	pqxx::work tx(*db_conn);
 
@@ -92,7 +92,7 @@ void MyDataBase::deleteClient(int client_id) {
 	tx.commit();
 }
 
-// Метод, позволяющий найти клиента по его данным по имени, фамилии, email или телефону. Возвращает id клиента
+// РњРµС‚РѕРґ, РїРѕР·РІРѕР»СЏСЋС‰РёР№ РЅР°Р№С‚Рё РєР»РёРµРЅС‚Р° РїРѕ РµРіРѕ РґР°РЅРЅС‹Рј РїРѕ РёРјРµРЅРё, С„Р°РјРёР»РёРё, email РёР»Рё С‚РµР»РµС„РѕРЅСѓ. Р’РѕР·РІСЂР°С‰Р°РµС‚ id РєР»РёРµРЅС‚Р°
 int MyDataBase::selectClient(std::string first_name, std::string second_name, std::string email, std::string phone) {
 	pqxx::work tx(*db_conn);
 	int id = 0;
